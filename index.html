@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#0b1326] text-[#dae2fd] font-sans dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quizle</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "tertiary-container": "#00a572",
+                    "secondary-container": "#3131c0",
+                    "on-surface-variant": "#c2c6d6",
+                    "on-background": "#dae2fd",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "inverse-primary": "#005ac2",
+                    "on-primary-container": "#00285d",
+                    "surface-container-high": "#222a3d",
+                    "surface-bright": "#31394d",
+                    "surface-dim": "#0b1326",
+                    "secondary-fixed": "#e1e0ff",
+                    "on-primary-fixed": "#001a42",
+                    "on-primary": "#002e6a",
+                    "surface": "#0b1326",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "inverse-surface": "#dae2fd",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-secondary-fixed-variant": "#2f2ebe",
+                    "secondary": "#c0c1ff",
+                    "outline-variant": "#424754",
+                    "error-container": "#93000a",
+                    "tertiary": "#4edea3",
+                    "primary": "#adc6ff",
+                    "on-secondary": "#1000a9",
+                    "surface-container-highest": "#2d3449",
+                    "surface-container-low": "#131b2e",
+                    "tertiary-fixed": "#6ffbbe",
+                    "surface-container": "#171f33",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#c0c1ff",
+                    "on-tertiary-fixed": "#002113",
+                    "on-tertiary-container": "#00311f",
+                    "on-secondary-fixed": "#07006c",
+                    "outline": "#8c909f",
+                    "on-secondary-container": "#b0b2ff",
+                    "on-surface": "#dae2fd",
+                    "on-tertiary": "#003824",
+                    "surface-variant": "#2d3449",
+                    "primary-fixed": "#d8e2ff",
+                    "primary-container": "#4d8eff",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#060e20",
+                    "inverse-on-surface": "#283044",
+                    "error": "#ffb4ab",
+                    "background": "#0b1326",
+                    "surface-tint": "#adc6ff"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+                "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+                }
+            },
+        },
+    }
+  </script>
+
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-6ZpJYlXQF9V3Tg1Z4D4eD5VJZcYh3c5B5b5JXhT5WzW5+5U+L5/8x9e8r9N9R7K" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-+cQeVZQMjfC2R5Zg6KZf5c8R1Xf6Q5jR7i5g9j4N6U9L5R1Z4c9E5K9k8U9Q9L7" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-9Nw2rBw3Yx+ZK+5pR9T+fQ3J3H5F4G8M5S6J6F8L6H6K9L8R9M9N9P8Q8" crossorigin="anonymous"></script>
+  <!-- Marked for markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    
+    .glass-panel {
+        background: rgba(34, 42, 61, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(66, 71, 84, 0.1);
+    }
+    .glow-text {
+        background: linear-gradient(135deg, #adc6ff 0%, #3131c0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .ambient-shadow { box-shadow: 0 0 64px rgba(6, 14, 32, 0.4); }
+    .luminous-progress { box-shadow: 0 0 10px rgba(173, 198, 255, 0.5); }
+    
+    /* Flashcard 3D flip */
+    .flashcard { perspective: 1000px; }
+    .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+    .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 2rem; border-radius: 1.5rem; }
+    .flashcard-front { background: rgba(34, 42, 61, 0.9); border: 1px solid rgba(66, 71, 84, 0.3); }
+    .flashcard-back { background: rgba(23, 31, 51, 0.95); transform: rotateY(180deg); border: 1px solid rgba(78, 222, 163, 0.3); }
+    .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+    
+    /* Sidebar navigation styling */
+    nav#material-nav::-webkit-scrollbar { width: 4px; }
+    nav#material-nav::-webkit-scrollbar-thumb { background: #31394d; border-radius: 4px; }
+    
+    /* Hide scrollbar for textarea */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body antialiased relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+  
+  <!-- Decorative Background Element -->
+  <div class="absolute inset-0 z-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-container/20 via-surface to-surface"></div>
+
+  <!-- TopNavBar -->
+  <header class="bg-[#0b1326]/80 backdrop-blur-md font-headline tracking-tight top-0 z-50 shadow-lg shadow-indigo-950/50 sticky border-b border-outline-variant/10">
+    <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+        <!-- Brand -->
+        <div class="flex items-center gap-2 text-2xl font-black glow-text">
+            Quizle
+        </div>
+        <!-- Tabs -->
+        <div id="tabs-container" class="hidden md:flex items-center gap-6">
+            <button class="tab-btn active text-primary font-semibold transition-colors" data-tab="materials">Materials</button>
+            <button class="tab-btn text-on-surface-variant hover:text-primary font-semibold transition-colors" data-tab="flashcards">Flashcards</button>
+            <button class="tab-btn text-on-surface-variant hover:text-primary font-semibold transition-colors" data-tab="quiz">Quiz</button>
+        </div>
+        <!-- Trailing Actions -->
+        <div class="flex items-center gap-4">
+            <button id="reload-btn" class="hidden text-on-surface-variant hover:text-primary transition-colors scale-95 active:opacity-80 transition-transform flex items-center gap-1 text-sm font-medium">
+                <span class="material-symbols-outlined text-[20px]" data-icon="refresh">refresh</span> Load New
+            </button>
+        </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col w-full z-10 relative" id="app-root">
+    
+    <!-- Upload Area -->
+    <div id="uploader-view" class="flex-1 flex flex-col items-center justify-center p-4 md:p-8 w-full">
+        <!-- Error Message Banner -->
+        <div id="upload-error" class="hidden text-error bg-error-container/20 border border-error/50 p-4 rounded-xl mb-6 w-full max-w-4xl text-center text-sm font-medium"></div>
+        
+        <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dropzone (File Upload) -->
+            <div id="dropzone" class="glass-panel rounded-3xl p-8 text-center border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer group flex flex-col justify-center items-center min-h-[320px]">
+                <div class="w-20 h-20 rounded-full bg-primary-container/20 flex items-center justify-center text-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl" data-icon="upload_file">upload_file</span>
+                </div>
+                <h2 class="text-2xl font-bold text-on-surface mb-2">Upload Module</h2>
+                <p class="text-on-surface-variant mb-6 text-sm">Drag and drop your Quizle JSON file here, or click to browse.</p>
+                <button class="bg-surface-container-highest text-on-surface px-8 py-3 rounded-xl font-bold hover:bg-surface-bright transition-colors shadow-lg">
+                    Select File
+                </button>
+                <input type="file" accept="application/json" id="file-input" class="hidden" />
+            </div>
+
+            <!-- Paste Area (Text Input) -->
+            <div class="glass-panel rounded-3xl p-8 flex flex-col items-center text-center border-2 border-transparent focus-within:border-primary transition-colors min-h-[320px]">
+                <h2 class="text-2xl font-bold text-on-surface mb-2">Paste JSON</h2>
+                <p class="text-on-surface-variant mb-4 text-sm">Have the raw content? Paste it directly below.</p>
+                <textarea id="json-paste-area" class="w-full flex-1 bg-surface-container-high/50 border border-outline-variant/30 rounded-xl p-4 text-on-surface text-sm font-mono resize-none focus:outline-none focus:border-primary transition-colors scrollbar-hide" placeholder='{&#10;  "topic": "Example",&#10;  "materials": [...],&#10;  "flashcards": [...],&#10;  "questions": [...]&#10;}'></textarea>
+                <button id="load-paste-btn" class="mt-4 bg-primary text-on-primary px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary-container/20 w-full">
+                    Load Content
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materials View -->
+    <div id="materials-view" class="hidden flex-1 flex flex-col md:flex-row w-full max-w-screen-2xl mx-auto">
+        <!-- Sidebar Navigation -->
+        <nav id="material-nav" class="w-full md:w-72 md:border-r border-outline-variant/10 bg-surface-container-low/50 p-6 overflow-y-auto hidden md:flex flex-col gap-2 h-[calc(100vh-73px)] sticky top-[73px]">
+            <h3 class="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-4">Topics</h3>
+            <div id="nav-links" class="flex flex-col gap-1"></div>
+        </nav>
+        
+        <!-- Mobile Nav Toggle -->
+        <div class="md:hidden p-4 border-b border-outline-variant/10 w-full flex overflow-x-auto gap-2 scrollbar-hide" id="mobile-nav-links">
+        </div>
+
+        <!-- Content Area -->
+        <article class="flex-1 p-6 md:p-12 md:py-16 max-w-4xl mx-auto w-full">
+            <div id="material-content" class="prose prose-invert max-w-none text-on-surface-variant text-lg leading-relaxed space-y-6"></div>
+        </article>
+    </div>
+
+    <!-- Flashcards View -->
+    <div id="flashcards-view" class="hidden flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl flex flex-col items-center gap-10">
+            <!-- Progress -->
+            <div class="flex items-center justify-between w-full text-sm font-medium text-on-surface-variant px-4">
+                <span id="fc-progress">Card 1 of 10</span>
+                <span class="text-tertiary flex items-center gap-1"><span class="material-symbols-outlined text-sm">psychology</span> Focus Mode</span>
+            </div>
+            
+            <!-- Card -->
+            <div id="flashcard" class="flashcard w-full aspect-[3/2] max-w-lg mx-auto ambient-shadow rounded-3xl">
+                <div class="flashcard-inner">
+                    <div class="flashcard-face flashcard-front flex flex-col justify-center items-center text-center">
+                        <span class="material-symbols-outlined absolute top-6 right-6 text-on-surface-variant/30">touch_app</span>
+                        <div id="fc-front-content" class="text-2xl md:text-3xl font-headline font-bold text-on-surface leading-tight"></div>
+                    </div>
+                    <div class="flashcard-face flashcard-back flex flex-col justify-center items-center text-center border-l-4 border-tertiary">
+                        <span class="material-symbols-outlined absolute top-6 right-6 text-tertiary/30">lightbulb</span>
+                        <div id="fc-back-content" class="text-xl md:text-2xl text-tertiary-fixed font-medium leading-relaxed"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-4 w-full justify-center mt-4">
+                <button id="fc-prev" class="w-14 h-14 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors border border-outline-variant/30 shadow-lg">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <div class="w-32 text-center text-sm font-bold text-on-surface tracking-widest uppercase">Flip to Learn</div>
+                <button id="fc-next" class="w-14 h-14 rounded-full bg-surface-container-high hover:bg-surface-bright flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors border border-outline-variant/30 shadow-lg">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz View - Compacted Layout -->
+    <div id="quiz-view" class="hidden flex-1 flex flex-col items-center justify-center p-4 py-6 w-full max-w-3xl mx-auto space-y-4 relative">
+        <div id="quiz-content-area" class="w-full space-y-4"></div>
+    </div>
+
+  </main>
+
+  <script>
+    let quizData = null;
+
+    function showError(msg) {
+        const errDiv = document.getElementById('upload-error');
+        errDiv.textContent = msg;
+        errDiv.classList.remove('hidden');
+        setTimeout(() => errDiv.classList.add('hidden'), 6000);
+    }
+
+    // This is where the code change is: using @@@MATH_BLOCK_X@@@ instead of ___MATH_BLOCK_X___
+    // This stops Markdown from treating underscores as italic formatting.
+    function renderMarkdown(md) {
+      if (typeof marked === 'undefined') return md;
+      if (!md) return '';
+      
+      const mathBlocks = [];
+      
+      md = md.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+          mathBlocks.push(match);
+          return `@@@MATH_BLOCK_${mathBlocks.length - 1}@@@`;
+      });
+      
+      md = md.replace(/\$([\s\S]*?)\$/g, (match) => {
+          mathBlocks.push(match);
+          return `@@@MATH_BLOCK_${mathBlocks.length - 1}@@@`;
+      });
+      
+      let html = marked.parse(md);
+      
+      mathBlocks.forEach((block, i) => {
+          html = html.replace(`@@@MATH_BLOCK_${i}@@@`, block);
+      });
+      
+      return html;
+    }
+
+    function renderLatex(container) {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(container, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // ---- MATERIALS LOGIC ----
+    function renderMaterials() {
+      const navContainer = document.getElementById('nav-links');
+      const mobileNavContainer = document.getElementById('mobile-nav-links');
+      const contentContainer = document.getElementById('material-content');
+      
+      navContainer.innerHTML = '';
+      mobileNavContainer.innerHTML = '';
+      
+      quizData.materials.forEach((para, idx) => {
+        const firstLine = para.split('\n')[0].replace(/^##?\s*/, '').trim();
+        
+        const btn = document.createElement('button');
+        btn.className = 'text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ' + 
+                        (idx === 0 ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface');
+        btn.textContent = firstLine || `Section ${idx + 1}`;
+        
+        const mBtn = document.createElement('button');
+        mBtn.className = 'whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ' +
+                         (idx === 0 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant');
+        mBtn.textContent = firstLine || `Section ${idx + 1}`;
+
+        const updateView = () => {
+          Array.from(navContainer.children).forEach(b => {
+            b.className = 'text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface border-l-4 border-transparent';
+          });
+          btn.className = 'text-left px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium bg-primary/10 text-primary border-l-4 border-primary';
+          
+          Array.from(mobileNavContainer.children).forEach(b => {
+            b.className = 'whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-surface-container-high text-on-surface-variant';
+          });
+          mBtn.className = 'whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-primary text-on-primary';
+          
+          contentContainer.innerHTML = renderMarkdown(para);
+          renderLatex(contentContainer);
+        };
+
+        btn.onclick = updateView;
+        mBtn.onclick = updateView;
+        
+        navContainer.appendChild(btn);
+        mobileNavContainer.appendChild(mBtn);
+        
+        if (idx === 0) updateView();
+      });
+    }
+
+    // ---- FLASHCARDS LOGIC ----
+    let currentFlashcardIdx = 0;
+    function renderFlashcards() {
+      const cardElement = document.getElementById('flashcard');
+      const frontContent = document.getElementById('fc-front-content');
+      const backContent = document.getElementById('fc-back-content');
+      const progressText = document.getElementById('fc-progress');
+      
+      currentFlashcardIdx = 0;
+      cardElement.classList.remove('flipped');
+      
+      function updateCard() {
+        const fc = quizData.flashcards[currentFlashcardIdx];
+        progressText.textContent = `Card ${currentFlashcardIdx + 1} of ${quizData.flashcards.length}`;
+        
+        frontContent.innerHTML = renderMarkdown(fc.front);
+        backContent.innerHTML = renderMarkdown(fc.back);
+        
+        renderLatex(frontContent);
+        renderLatex(backContent);
+      }
+
+      cardElement.onclick = () => cardElement.classList.toggle('flipped');
+
+      document.getElementById('fc-prev').onclick = () => {
+        currentFlashcardIdx = (currentFlashcardIdx - 1 + quizData.flashcards.length) % quizData.flashcards.length;
+        cardElement.classList.remove('flipped');
+        setTimeout(updateCard, 150);
+      };
+      
+      document.getElementById('fc-next').onclick = () => {
+        currentFlashcardIdx = (currentFlashcardIdx + 1) % quizData.flashcards.length;
+        cardElement.classList.remove('flipped');
+        setTimeout(updateCard, 150);
+      };
+
+      updateCard();
+    }
+
+    // ---- QUIZ LOGIC ----
+    function renderQuiz() {
+      const container = document.getElementById('quiz-content-area');
+      const questions = quizData.questions;
+      let qIdx = 0;
+      let score = 0;
+      let state = { answered: false, selected: null, showHint: false };
+
+      function updateQuestion() {
+        container.innerHTML = '';
+        const q = questions[qIdx];
+        
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'space-y-2 px-2';
+        const percent = ((qIdx) / questions.length) * 100;
+        progressDiv.innerHTML = `
+            <div class="flex justify-between items-center text-on-surface-variant font-label text-xs md:text-sm uppercase tracking-widest">
+                <span>Quiz</span>
+                <span>Question ${qIdx + 1} of ${questions.length}</span>
+            </div>
+            <div class="h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                <div class="h-full bg-primary luminous-progress rounded-full transition-all duration-500" style="width: ${percent}%;"></div>
+            </div>
+        `;
+        container.appendChild(progressDiv);
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'glass-panel rounded-3xl p-6 md:p-8 ambient-shadow w-full';
+        
+        const qTitle = document.createElement('h1');
+        qTitle.className = 'text-xl md:text-2xl font-headline font-bold mb-6 text-on-surface leading-tight';
+        qTitle.innerHTML = renderMarkdown(q.text);
+        cardDiv.appendChild(qTitle);
+        
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'space-y-3';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            
+            const renderOptionState = () => {
+                if (!state.answered) {
+                    if (state.selected === i) {
+                        btn.className = 'w-full text-left p-4 md:p-5 rounded-2xl bg-primary/10 border border-primary transition-all duration-300 flex items-center gap-4 relative overflow-hidden text-on-surface';
+                        btn.innerHTML = `
+                            <div class="w-6 h-6 text-sm rounded-full bg-primary flex items-center justify-center text-on-primary shrink-0 transition-colors">
+                                ${String.fromCharCode(65 + i)}
+                            </div>
+                            <span class="text-base md:text-lg flex-1">${renderMarkdown(opt)}</span>
+                        `;
+                    } else {
+                        btn.className = 'w-full text-left p-4 md:p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 hover:bg-surface-container-high transition-all duration-300 group flex items-center gap-4 relative overflow-hidden';
+                        btn.innerHTML = `
+                            <div class="w-6 h-6 text-sm rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant group-hover:border-primary group-hover:text-primary transition-colors shrink-0">
+                                ${String.fromCharCode(65 + i)}
+                            </div>
+                            <span class="text-base md:text-lg text-on-surface-variant group-hover:text-on-surface transition-colors flex-1">${renderMarkdown(opt)}</span>
+                        `;
+                    }
+                } else {
+                    if (i === q.correctIndex) {
+                        btn.className = 'w-full text-left p-4 md:p-5 rounded-2xl bg-tertiary-container/10 border border-tertiary transition-all duration-300 flex items-center gap-4 relative overflow-hidden';
+                        btn.innerHTML = `
+                            <div class="w-6 h-6 text-sm rounded-full bg-tertiary flex items-center justify-center text-on-tertiary shrink-0">
+                                <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">check</span>
+                            </div>
+                            <span class="text-base md:text-lg text-tertiary-fixed flex-1">${renderMarkdown(opt)}</span>
+                            <div class="absolute right-4 opacity-50"><span class="material-symbols-outlined text-tertiary">stars</span></div>
+                        `;
+                    } else if (state.selected === i) {
+                        btn.className = 'w-full text-left p-4 md:p-5 rounded-2xl bg-error-container/10 border border-error transition-all duration-300 flex items-center gap-4 relative overflow-hidden';
+                        btn.innerHTML = `
+                            <div class="w-6 h-6 text-sm rounded-full bg-error flex items-center justify-center text-on-error shrink-0">
+                                <span class="material-symbols-outlined text-xs">close</span>
+                            </div>
+                            <span class="text-base md:text-lg text-error flex-1">${renderMarkdown(opt)}</span>
+                        `;
+                    } else {
+                        btn.className = 'w-full text-left p-4 md:p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant/10 opacity-50 flex items-center gap-4 relative overflow-hidden';
+                        btn.innerHTML = `
+                            <div class="w-6 h-6 text-sm rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant shrink-0">
+                                ${String.fromCharCode(65 + i)}
+                            </div>
+                            <span class="text-base md:text-lg text-on-surface-variant flex-1">${renderMarkdown(opt)}</span>
+                        `;
+                    }
+                }
+                renderLatex(btn);
+            };
+            
+            renderOptionState();
+            
+            btn.onclick = () => {
+                if (state.answered) return;
+                state.selected = i;
+                Array.from(optsDiv.children).forEach((child) => child.click_render());
+                
+                const submitBtn = document.getElementById('quiz-submit-btn');
+                if (submitBtn) submitBtn.disabled = false;
+            };
+            
+            btn.click_render = renderOptionState;
+            optsDiv.appendChild(btn);
+        });
+        cardDiv.appendChild(optsDiv);
+        
+        if (state.answered || state.showHint) {
+            const expDiv = document.createElement('div');
+            expDiv.className = 'mt-4 p-4 rounded-2xl bg-surface-container-lowest border-l-2 ' + (state.answered ? 'border-tertiary' : 'border-primary');
+            expDiv.innerHTML = `
+                <div class="flex items-center gap-2 ${state.answered ? 'text-tertiary' : 'text-primary'} font-bold mb-2 uppercase tracking-wide text-xs md:text-sm">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+                    ${state.answered ? 'Explanation' : 'Hint'}
+                </div>
+                <div class="text-on-surface-variant text-sm md:text-base leading-relaxed">
+                    ${renderMarkdown(state.answered ? q.explanation || q.hint : q.hint)}
+                </div>
+            `;
+            cardDiv.appendChild(expDiv);
+        }
+        
+        container.appendChild(cardDiv);
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex flex-col sm:flex-row justify-between items-center gap-4 px-2';
+        
+        if (!state.answered) {
+            const hintBtn = document.createElement('button');
+            hintBtn.className = 'text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 px-4 py-2 font-medium text-sm';
+            hintBtn.innerHTML = `<span class="material-symbols-outlined text-base">help_outline</span> ${state.showHint ? 'Hide Hint' : 'Get Hint'}`;
+            hintBtn.onclick = () => { state.showHint = !state.showHint; updateQuestion(); };
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.id = 'quiz-submit-btn';
+            submitBtn.className = 'w-full sm:w-auto bg-gradient-to-br from-primary to-secondary-container text-on-primary px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 disabled:opacity-40 disabled:cursor-not-allowed';
+            submitBtn.innerHTML = `Submit Answer <span class="material-symbols-outlined text-base">check_circle</span>`;
+            submitBtn.disabled = state.selected === null;
+            submitBtn.onclick = () => {
+                state.answered = true;
+                if (state.selected === q.correctIndex) score++;
+                updateQuestion();
+            };
+            
+            actionsDiv.append(hintBtn, submitBtn);
+        } else {
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'w-full sm:w-auto bg-gradient-to-br from-primary to-secondary-container text-on-primary px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 ml-auto';
+            nextBtn.innerHTML = (qIdx === questions.length - 1 ? 'Finish Quiz' : 'Next Question') + ` <span class="material-symbols-outlined text-base">arrow_forward</span>`;
+            nextBtn.onclick = () => {
+                qIdx++;
+                state = { answered: false, selected: null, showHint: false };
+                if (qIdx < questions.length) {
+                    updateQuestion();
+                } else {
+                    showResult();
+                }
+            };
+            actionsDiv.appendChild(nextBtn);
+        }
+        
+        container.appendChild(actionsDiv);
+        renderLatex(container);
+      }
+
+      function showResult() {
+        container.innerHTML = `
+            <div class="glass-panel rounded-3xl p-8 md:p-12 text-center ambient-shadow w-full">
+                <h2 class="text-3xl md:text-4xl font-headline font-bold mb-4 text-on-surface">Quiz Completed!</h2>
+                <div class="text-5xl md:text-6xl font-black glow-text mb-6">${score} / ${questions.length}</div>
+                <p class="text-lg md:text-xl text-on-surface-variant mb-8">You scored ${Math.round((score/questions.length)*100)}%.</p>
+                <button id="restart-quiz" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary-container/20">
+                    Retake Quiz
+                </button>
+            </div>
+        `;
+        document.getElementById('restart-quiz').onclick = () => {
+            qIdx = 0; score = 0;
+            state = { answered: false, selected: null, showHint: false };
+            updateQuestion();
+        };
+      }
+
+      updateQuestion();
+    }
+
+    // ---- TAB MANAGEMENT ----
+    const views = ['materials', 'flashcards', 'quiz'];
+    function switchTab(target) {
+      views.forEach(v => {
+        document.getElementById(v + '-view').classList.add('hidden');
+        document.querySelector(`[data-tab="${v}"]`)?.classList.remove('active', 'text-primary');
+        document.querySelector(`[data-tab="${v}"]`)?.classList.add('text-on-surface-variant');
+      });
+      
+      document.getElementById(target + '-view').classList.remove('hidden');
+      if (target === 'materials') document.getElementById('materials-view').classList.add('flex');
+      
+      document.querySelector(`[data-tab="${target}"]`)?.classList.remove('text-on-surface-variant');
+      document.querySelector(`[data-tab="${target}"]`)?.classList.add('active', 'text-primary');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => switchTab(e.target.getAttribute('data-tab')));
+    });
+
+    document.getElementById('reload-btn').addEventListener('click', () => location.reload());
+
+    // ---- INIT APP ----
+    function initApp() {
+        renderMaterials();
+        renderFlashcards();
+        renderQuiz();
+        document.getElementById('uploader-view').classList.add('hidden');
+        document.getElementById('tabs-container').classList.remove('hidden');
+        document.getElementById('reload-btn').classList.remove('hidden');
+        switchTab('materials');
+    }
+
+    // ---- FILE UPLOAD & PASTE ----
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          quizData = JSON.parse(e.target.result);
+          initApp();
+        } catch (err) {
+          showError('Invalid JSON formatting in file. Please ensure it perfectly matches the schema.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-primary', 'bg-surface-container-high/50');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-primary', 'bg-surface-container-high/50');
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-primary', 'bg-surface-container-high/50');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    const loadPasteBtn = document.getElementById('load-paste-btn');
+    const pasteArea = document.getElementById('json-paste-area');
+    
+    loadPasteBtn.addEventListener('click', () => {
+        const text = pasteArea.value;
+        if (!text.trim()) {
+            showError('Please paste some JSON data first.');
+            return;
+        }
+        try {
+            quizData = JSON.parse(text);
+            initApp();
+        } catch (err) {
+            showError('Invalid JSON formatting in pasted text. ' + err.message);
+        }
+    });
+
+  </script>
+</body>
+</html>

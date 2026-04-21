@@ -1,0 +1,48 @@
+{
+  "topic": "FPV Drone Building: Detailed Electronics Guide",
+  "materials": [
+    "## Introduction\nFPV (First Person View) drone building combines aeronautics, electronics, and software. This guide walks through selecting components, wiring, and tuning your system.",
+    "## Frame Selection\nChoose a frame based on motor size, battery capacity, and intended flight style (racing vs cinematic). Common materials include carbon fiber for strength and lightweight.",
+    "## Motors and Propellers\nSelect brushless motors with appropriate KV rating. Pair with propellers that match motor thrust curves. Example: 2205 2300KV motors with 5-inch props for racing.",
+    "## ESC (Electronic Speed Controller)\nESCs regulate motor power. Look for 4‑in‑1 units for compact builds. Ensure the ESC current rating exceeds motor draw by at least 20%.",
+    "## Flight Controller (FC)\nThe FC processes sensor data and runs firmware (Betaflight, iNav). Connect IMU, barometer, and optional GPS. Configure PID loops for stable flight.",
+    "## Power Distribution\nUse a Power Distribution Board (PDB) or solder a custom harness. Maintain proper voltage polarity and keep high‑current wires short to reduce loss.",
+    "## Video Transmission\nChoose a VTX (Video Transmitter) with adjustable power (25‑800mW). Pair with an appropriate antenna (circular polarized) and ensure compliance with local regulations.",
+    "## Receiver and Radio\nSelect a multi‑protocol receiver (e.g., FrSky R-XSR) compatible with your transmitter. Bind and set failsafe to safe throttle.",
+    "## Batteries\nLiPo batteries are standard. Verify cell count (3S, 4S, 6S) matches motor and ESC specifications. Observe proper charging and storage procedures.",
+    "## Wiring and Soldering Tips\nUse heat‑shrink tubing, color‑code wires, and double‑check solder joints. Keep the power leads separate from signal lines to minimize interference."
+  ],
+  "flashcards": [
+    { "front": "What does KV stand for in a brushless motor?", "back": "KV is the motor's RPM per volt (no‑load speed)." },
+    { "front": "Why use a 4‑in‑1 ESC?", "back": "It consolidates power distribution and reduces wiring complexity, saving weight and space." },
+    { "front": "Which component handles video transmission?", "back": "The VTX (Video Transmitter) and its antenna." }
+  ],
+  "questions": [
+    {
+      "text": "What is the recommended way to ensure the ESC can handle motor current?",
+      "options": [
+        "Choose an ESC with a current rating at least 10% higher than motor draw.",
+        "Select an ESC with a current rating equal to motor draw.",
+        "Pick an ESC with a rating 20% higher than the motor's maximum current.",
+        "Use any ESC; current rating is not critical."
+      ],
+      "correctIndex": 2,
+      "hint": "Add a safety margin to avoid overheating.",
+      "explanation": "An ESC should be rated at least 20% higher than the motor's maximum current draw to ensure reliable operation and prevent overheating."
+    },
+    {
+      "text": "Which firmware is commonly used on FPV flight controllers?",
+      "options": ["ArduPilot", "Betaflight", "Cleanflight", "PX4"],
+      "correctIndex": 1,
+      "hint": "Popular among racing pilots.",
+      "explanation": "Betaflight is the most popular firmware for FPV racing drones, offering extensive tuning and feature support."
+    },
+    {
+      "text": "What is the primary purpose of a power distribution board (PDB)?",
+      "options": ["To manage video signal routing", "To distribute battery voltage to components", "To provide GPS data", "To control motor speed"],
+      "correctIndex": 1,
+      "hint": "Think about supplying power.",
+      "explanation": "A PDB distributes the battery voltage to the ESCs, VTX, receiver, and other components, simplifying wiring."
+    }
+  ]
+}
